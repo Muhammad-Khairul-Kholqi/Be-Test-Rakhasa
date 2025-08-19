@@ -1,32 +1,34 @@
-require('dotenv').config();
 const express = require('express');
-const app = express();
-const db = require('./models');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const setupSwagger = require('./swagger');
+dotenv.config();
+
 const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/user');
 const testRoutes = require('./routes/test');
+const userRoutes = require('./routes/user');
+const roleRoutes = require('./routes/role');
+const permissionRoutes = require('./routes/permission');
 
-// Initialize database
-db.initializeDatabase();
+const app = express();
 
-// Middleware
-app.use(express.json());
+app.use(cors());
+app.use(bodyParser.json());
 
-// Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
 app.use('/api/test', testRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/roles', roleRoutes);
+app.use('/api/permissions', permissionRoutes);
 
-// Error handling
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        message: 'Internal server error'
+setupSwagger(app);
+
+app.get('/api/test', (req, res) => {
+    res.json({
+        message: 'API is running'
     });
 });
 
-// Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

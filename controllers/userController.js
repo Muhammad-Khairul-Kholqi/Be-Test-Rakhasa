@@ -1,49 +1,92 @@
-const bcrypt = require('bcryptjs');
-const db = require('../config/db');
-const {
-    ROLES
-} = require('../config/roles');
+const db = require('../db'); 
+const bcrypt = require('bcrypt');
 
-const createUser = async (req, res) => {
+const getUsers = async (req, res) => {
     try {
-        const {
-            username,
-            password,
-            role
-        } = req.body;
-
-        if (!Object.values(ROLES).includes(role)) {
-            return res.status(400).json({
-                message: 'Invalid role'
-            });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const [result] = await db.query(
-            'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
-            [username, hashedPassword, role]
+        const [rows] = await db.promise().query(
+            `SELECT u.id, u.username, u.email, r.name AS role
+             FROM Users u
+             LEFT JOIN Roles r ON u.roleId = r.id`
         );
-
-        res.status(201).json({
-            id: result.insertId,
-            username,
-            role
-        });
-    } catch (error) {
-        console.error(error);
+        res.json(rows);
+    } catch (err) {
+        console.error(err);
         res.status(500).json({
             message: 'Server error'
         });
     }
 };
 
-const getUsers = async (req, res) => {
+const createUser = async (req, res) => {
+    const {
+        username,
+        email,
+        password,
+        roleId
+    } = req.body;
     try {
-        const [users] = await db.query('SELECT id, username, role FROM users');
-        res.json(users);
-    } catch (error) {
-        console.error(error);
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await db.promise().query(
+            `INSERT INTO Users (username, email, password, roleId) VALUES (?, ?, ?, ?)`,
+            [username, email, hashedPassword, roleId]
+        );
+        res.status(201).json({
+            message: 'User created successfully'
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: 'Server error'
+        });
+    }
+};
+
+const updateUser = async (req, res) => {
+    const {
+        id
+    } = req.params;
+    const {
+        username,
+        email,
+        password,
+        roleId
+    } = req.body;
+    try {
+        let query = `UPDATE Users SET username=?, email=?, roleId=?`;
+        const params = [username, email, roleId];
+
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            query += `, password=?`;
+            params.push(hashedPassword);
+        }
+
+        query += ` WHERE id=?`;
+        params.push(id);
+
+        await db.promise().query(query, params);
+        res.json({
+            message: 'User updated successfully'
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: 'Server error'
+        });
+    }
+};
+
+const deleteUser = async (req, res) => {
+    const {
+        id
+    } = req.params;
+    try {
+        await db.promise().query(`DELETE FROM Users WHERE id=?`, [id]);
+        res.json({
+            message: 'User deleted successfully'
+        });
+    } catch (err) {
+        console.error(err);
         res.status(500).json({
             message: 'Server error'
         });
@@ -51,6 +94,8 @@ const getUsers = async (req, res) => {
 };
 
 module.exports = {
+    getUsers,
     createUser,
-    getUsers
+    updateUser,
+    deleteUser
 };

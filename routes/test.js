@@ -1,22 +1,71 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middlewares/auth');
-const checkRole = require('../middlewares/role');
 const {
-    PERMISSIONS
-} = require('../config/roles');
-const testController = require('../controllers/testController');
+    verifyToken,
+    checkRole
+} = require('../middleware/auth');
 
-// Public route
-router.get('/public', testController.publicRoute);
+/**
+ * @swagger
+ * tags:
+ *   name: Test
+ *   description: Route test untuk role/user/public
+ */
 
-// Protected route for any authenticated user
-router.get('/user', auth, testController.userRoute);
+/**
+ * @swagger
+ * /api/test/admin-test:
+ *   get:
+ *     summary: Route khusus admin
+ *     tags: [Test]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Hello Admin
+ *       403:
+ *         description: Forbidden, akses ditolak
+ */
+router.get('/admin-test', verifyToken, checkRole([1]), (req, res) => {
+    res.json({
+        message: 'Hello Admin, you have access!'
+    });
+});
 
-// Admin-only route
-router.get('/admin', auth, checkRole(PERMISSIONS.TEST_PERMISSION), testController.adminRoute);
+/**
+ * @swagger
+ * /api/test/user-test:
+ *   get:
+ *     summary: Route khusus user
+ *     tags: [Test]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Hello User
+ *       403:
+ *         description: Forbidden, akses ditolak
+ */
+router.get('/user-test', verifyToken, checkRole([2]), (req, res) => {
+    res.json({
+        message: 'Hello User, you have access!'
+    });
+});
 
-// Permission test route
-router.get('/permission', auth, checkRole(PERMISSIONS.TEST_PERMISSION), testController.permissionTest);
+/**
+ * @swagger
+ * /api/test/public-test:
+ *   get:
+ *     summary: Route public, bisa diakses semua
+ *     tags: [Test]
+ *     responses:
+ *       200:
+ *         description: Hello Public
+ */
+router.get('/public-test', (req, res) => {
+    res.json({
+        message: 'Hello, this is public route!'
+    });
+});
 
 module.exports = router;
