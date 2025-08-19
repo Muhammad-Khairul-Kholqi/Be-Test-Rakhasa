@@ -50,26 +50,28 @@ http://localhost:3000
 API Endpoints
 
 ## API Endpoints
-| Route | Method | Description | Protected / Role / Permission |
-|-------|--------|-------------|-------------------------------|
-| /api/auth/register | POST | Register user baru | No |
-| /api/auth/login | POST | Login dan dapatkan JWT token | No |
-| /api/users | GET | Ambil semua user | Yes / Admin / view_user |
-| /api/users | POST | Buat user baru | Yes / Admin / create_user |
-| /api/users/:id | PUT | Update user | Yes / Admin / edit_user |
-| /api/users/:id | DELETE | Hapus user | Yes / Admin / delete_user |
-| /api/roles | GET | Ambil semua role | Yes / Admin |
-| /api/roles | POST | Buat role baru | Yes / Admin |
-| /api/roles/:id | PUT | Update role | Yes / Admin |
-| /api/roles/:id | DELETE | Hapus role | Yes / Admin |
-| /api/roles/:roleId/permissions | POST | Assign permission ke role | Yes / Admin |
-| /api/permissions | GET | Ambil semua permission | Yes / Admin |
-| /api/permissions | POST | Buat permission baru | Yes / Admin |
-| /api/permissions/:id | PUT | Update permission | Yes / Admin |
-| /api/permissions/:id | DELETE | Hapus permission | Yes / Admin |
-| /api/test/admin-test | GET | Route khusus admin | Yes / Admin |
-| /api/test/user-test | GET | Route khusus user | Yes / User |
-| /api/test/public-test | GET | Route public | No |
+## API Endpoints
+
+| Endpoint                     | URL                                      | Keterangan                                      |
+|-------------------------------|-----------------------------------------|------------------------------------------------|
+| Register User                 | `/api/auth/register`                     | Register user baru                              |
+| Login User                    | `/api/auth/login`                        | Login dan dapatkan JWT token                    |
+| Get All Users                 | `/api/users`                             | Ambil semua user (Admin, permission: view_user)|
+| Create User                   | `/api/users`                             | Buat user baru (Admin, permission: create_user)|
+| Update User                   | `/api/users/:id`                         | Update user tertentu (Admin, permission: edit_user)|
+| Delete User                   | `/api/users/:id`                         | Hapus user (Admin, permission: delete_user)    |
+| Get All Roles                 | `/api/roles`                             | Ambil semua role (Admin)                        |
+| Create Role                   | `/api/roles`                             | Buat role baru (Admin)                          |
+| Update Role                   | `/api/roles/:id`                         | Update role tertentu (Admin)                    |
+| Delete Role                   | `/api/roles/:id`                         | Hapus role (Admin)                              |
+| Assign Permissions to Role    | `/api/roles/:roleId/permissions`         | Assign permission ke role (Admin)              |
+| Get All Permissions           | `/api/permissions`                       | Ambil semua permission (Admin)                 |
+| Create Permission             | `/api/permissions`                       | Buat permission baru (Admin)                   |
+| Update Permission             | `/api/permissions/:id`                   | Update permission tertentu (Admin)             |
+| Delete Permission             | `/api/permissions/:id`                   | Hapus permission (Admin)                        |
+| Test Admin Route              | `/api/test/admin-test`                    | Route khusus admin                              |
+| Test User Route               | `/api/test/user-test`                     | Route khusus user                               |
+| Test Public Route             | `/api/test/public-test`                   | Route publik, bisa diakses semua               |
 
 ## Swagger Documentation
 http://localhost:3000/api/docs
